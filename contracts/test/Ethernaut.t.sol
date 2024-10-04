@@ -45,7 +45,15 @@ contract TestEthernaut is Test {
 
         ethernaut = new Ethernaut();
 
-        stats = Statistics(address(new ProxyStats(address(new Statistics()), owner, address(ethernaut))));
+        stats = Statistics(
+            address(
+                new ProxyStats(
+                    address(new Statistics()),
+                    owner,
+                    address(ethernaut)
+                )
+            )
+        );
 
         ethernaut.setStatistics(address(stats));
 

