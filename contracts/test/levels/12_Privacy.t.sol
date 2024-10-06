@@ -36,7 +36,9 @@ contract TestPrivacy is Test, Utils {
         vm.stopPrank();
 
         vm.startPrank(player);
-        instance = Privacy(payable(createLevelInstance(ethernaut, Level(address(factory)), 0)));
+        instance = Privacy(
+            payable(createLevelInstance(ethernaut, Level(address(factory)), 0))
+        );
         vm.stopPrank();
     }
 

@@ -21,7 +21,9 @@ contract Utils is Test {
     }
 
     // create users with 100 ETH balance each
-    function createUsers(uint256 userNum) public returns (address payable[] memory) {
+    function createUsers(
+        uint256 userNum
+    ) public returns (address payable[] memory) {
         address payable[] memory users = new address payable[](userNum);
         for (uint256 i = 0; i < userNum; i++) {
             address payable user = this.getNextUserAddress();
@@ -38,15 +40,24 @@ contract Utils is Test {
         vm.roll(targetBlock);
     }
 
-    function createLevelInstance(Ethernaut ethernaut, Level level, uint256 value) public returns (address instance) {
+    function createLevelInstance(
+        Ethernaut ethernaut,
+        Level level,
+        uint256 value
+    ) public returns (address instance) {
         vm.recordLogs();
         ethernaut.createLevelInstance{value: value}(level);
         Vm.Log[] memory entries = vm.getRecordedLogs();
 
-        instance = address(uint160(uint256(entries[entries.length - 1].topics[2])));
+        instance = address(
+            uint160(uint256(entries[entries.length - 1].topics[2]))
+        );
     }
 
-    function submitLevelInstance(Ethernaut ethernaut, address instance) public returns (bool) {
+    function submitLevelInstance(
+        Ethernaut ethernaut,
+        address instance
+    ) public returns (bool) {
         vm.recordLogs();
         ethernaut.submitLevelInstance(payable(instance));
         Vm.Log[] memory entries = vm.getRecordedLogs();
@@ -58,17 +69,39 @@ contract Utils is Test {
         }
     }
 
-    function getEthernautWithStatsProxy(address owner) public returns (Ethernaut) {
+    function getEthernautWithStatsProxy(
+        address owner
+    ) public returns (Ethernaut) {
         Ethernaut ethernaut = new Ethernaut();
-        Statistics stats = Statistics(address(new ProxyStats(address(new Statistics()), owner, address(ethernaut))));
+        Statistics stats = Statistics(
+            address(
+                new ProxyStats(
+                    address(new Statistics()),
+                    owner,
+                    address(ethernaut)
+                )
+            )
+        );
         ethernaut.setStatistics(address(stats));
         return ethernaut;
     }
 
-    function getOldFactory(string memory contractName) public returns (address addr) {
+    function getOldFactory(
+        string memory contractName
+    ) public returns (address addr) {
         string memory root = vm.projectRoot();
-        string memory path =
-            string.concat(root, string(abi.encodePacked("/out/", contractName, ".sol/", contractName, ".json")));
+        string memory path = string.concat(
+            root,
+            string(
+                abi.encodePacked(
+                    "/out/",
+                    contractName,
+                    ".sol/",
+                    contractName,
+                    ".json"
+                )
+            )
+        );
         string memory json = vm.readFile(path);
         bytes memory code = json.readBytes(".bytecode.object");
 
