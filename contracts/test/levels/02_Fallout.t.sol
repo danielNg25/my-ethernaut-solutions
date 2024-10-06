@@ -59,6 +59,8 @@ contract TestFallout is Test, Utils {
     function testSolve() public {
         vm.startPrank(player);
 
+        instance.Fal1out();
+
         assertTrue(submitLevelInstance(ethernaut, address(instance)));
     }
 }
