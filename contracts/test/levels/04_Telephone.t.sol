@@ -5,9 +5,11 @@ import "forge-std/Test.sol";
 import {Utils} from "test/utils/Utils.sol";
 
 import {Telephone} from "src/levels/Telephone.sol";
+import {TelephoneAttack} from "src/attacks/Telephone.sol";
 import {TelephoneFactory} from "src/levels/TelephoneFactory.sol";
 import {Level} from "src/levels/base/Level.sol";
 import {Ethernaut} from "src/Ethernaut.sol";
+import {console2} from "forge-std/console2.sol";
 
 contract TestTelephone is Test, Utils {
     Ethernaut ethernaut;
@@ -61,6 +63,9 @@ contract TestTelephone is Test, Utils {
     /// @notice Test the solution for the level.
     function testSolve() public {
         vm.startPrank(player);
+
+        new TelephoneAttack(address(instance));
+        console2.log("instance.owner()", instance.owner(), "player", player);
 
         assertTrue(submitLevelInstance(ethernaut, address(instance)));
     }
