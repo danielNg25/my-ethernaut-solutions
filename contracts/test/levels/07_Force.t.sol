@@ -8,6 +8,7 @@ import {Force} from "src/levels/Force.sol";
 import {ForceFactory} from "src/levels/ForceFactory.sol";
 import {Level} from "src/levels/base/Level.sol";
 import {Ethernaut} from "src/Ethernaut.sol";
+import {ForceAttack} from "src/attacks/ForceAttack.sol";
 
 contract TestForce is Test, Utils {
     Ethernaut ethernaut;
@@ -55,6 +56,11 @@ contract TestForce is Test, Utils {
     /// @notice Test the solution for the level.
     function testSolve() public {
         vm.startPrank(player);
+
+        ForceAttack attack = new ForceAttack();
+        attack.attack{value: 1 ether}(address(instance));
+
+        console.log("Balance of instance: %s", address(instance).balance);
 
         assertTrue(submitLevelInstance(ethernaut, address(instance)));
     }
