@@ -62,6 +62,10 @@ contract TestVault is Test, Utils {
     function testSolve() public {
         vm.startPrank(player);
 
+        bytes32 pass = vm.load(address(instance), bytes32(uint256(1)));
+        instance.unlock(pass);
+        console2.log(instance.locked());
+
         assertTrue(submitLevelInstance(ethernaut, address(instance)));
     }
 }
