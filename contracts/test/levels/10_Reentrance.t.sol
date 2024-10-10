@@ -1,67 +1,79 @@
-// // SPDX-License-Identifier: MIT
-// pragma solidity ^0.8.0;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
 
-// import "forge-std/Test.sol";
-// import {Utils} from "test/utils/Utils.sol";
+import "forge-std/Test.sol";
+import {Utils} from "test/utils/Utils.sol";
 
-// import {DummyFactory} from "src/levels/DummyFactory.sol";
-// import {Reentrance} from "src/levels/Reentrance.sol";
-// import {Level} from "src/levels/base/Level.sol";
-// import {Ethernaut} from "src/Ethernaut.sol";
+import {DummyFactory} from "src/levels/DummyFactory.sol";
+import {Level} from "src/levels/base/Level.sol";
+import {Ethernaut} from "src/Ethernaut.sol";
+import {ReentrancyAttack} from "src/attacks/ReentrancyAttack.sol";
 
-// contract TestReentrance is Test, Utils {
-//     Ethernaut ethernaut;
-//     Reentrance instance;
+interface Reentrance {
+    function balances(address) external returns (uint256);
 
-//     address payable owner;
-//     address payable player;
+    function donate(address) external payable;
 
-//     /*//////////////////////////////////////////////////////////////
-//                                  HELPERS
-//     //////////////////////////////////////////////////////////////*/
+    function balanceOf(address) external returns (uint256);
 
-//     function setUp() public {
-//         address payable[] memory users = createUsers(2);
+    function withdraw(uint256) external;
+}
 
-//         owner = users[0];
-//         vm.label(owner, "Owner");
+contract TestReentrance is Test, Utils {
+    Ethernaut ethernaut;
+    Reentrance instance;
 
-//         player = users[1];
-//         vm.label(player, "Player");
+    address payable owner;
+    address payable player;
 
-//         vm.startPrank(owner);
-//         ethernaut = getEthernautWithStatsProxy(owner);
-//         DummyFactory factory = DummyFactory(getOldFactory("ReentranceFactory"));
-//         ethernaut.registerLevel(Level(address(factory)));
-//         vm.stopPrank();
+    /*//////////////////////////////////////////////////////////////
+                                 HELPERS
+    //////////////////////////////////////////////////////////////*/
 
-//         vm.startPrank(player);
-//         instance = Reentrance(
-//             payable(
-//                 createLevelInstance(
-//                     ethernaut,
-//                     Level(address(factory)),
-//                     0.001 ether
-//                 )
-//             )
-//         );
-//         vm.stopPrank();
-//     }
+    function setUp() public {
+        address payable[] memory users = createUsers(2);
 
-//     /*//////////////////////////////////////////////////////////////
-//                                  TESTS
-//     //////////////////////////////////////////////////////////////*/
+        owner = users[0];
+        vm.label(owner, "Owner");
 
-//     /// @notice Check the intial state of the level and enviroment.
-//     function testInit() public {
-//         vm.startPrank(player);
-//         assertFalse(submitLevelInstance(ethernaut, address(instance)));
-//     }
+        player = users[1];
+        vm.label(player, "Player");
 
-//     /// @notice Test the solution for the level.
-//     function testSolve() public {
-//         vm.startPrank(player);
+        vm.startPrank(owner);
+        ethernaut = getEthernautWithStatsProxy(owner);
+        DummyFactory factory = DummyFactory(getOldFactory("ReentranceFactory"));
+        ethernaut.registerLevel(Level(address(factory)));
+        vm.stopPrank();
 
-//         assertTrue(submitLevelInstance(ethernaut, address(instance)));
-//     }
-// }
+        vm.startPrank(player);
+        instance = Reentrance(
+            payable(
+                createLevelInstance(
+                    ethernaut,
+                    Level(address(factory)),
+                    0.001 ether
+                )
+            )
+        );
+        vm.stopPrank();
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                                 TESTS
+    //////////////////////////////////////////////////////////////*/
+
+    /// @notice Check the intial state of the level and enviroment.
+    function testInit() public {
+        vm.startPrank(player);
+        assertFalse(submitLevelInstance(ethernaut, address(instance)));
+    }
+
+    /// @notice Test the solution for the level.
+    function testSolve() public {
+        vm.startPrank(player);
+        ReentrancyAttack attack = new ReentrancyAttack(address(instance));
+        attack.attack{value: 0.001 ether}(1);
+
+        assertTrue(submitLevelInstance(ethernaut, address(instance)));
+    }
+}
